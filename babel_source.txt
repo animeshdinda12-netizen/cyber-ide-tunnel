@@ -1,34 +1,4 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Cyber IDE - Backendless Web Dev Studio</title>
-  <meta name="description" content="Premium backendless web IDE + Browser Tunnel deployment platform. Single HTML or split component projects with service-worker powered tunnel previews." />
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/lucide.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            slate: {
-              50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',
-              400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',
-              800:'#1e293b',900:'#0f172a',950:'#020617'
-            },
-            cyan: { 400:'#22d3ee',500:'#06b6d4',600:'#0891b2',700:'#0e738a' }
-          }
-        }
-      }
-    };
-  </script>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2306b6d4' d='M12 5v14m7-7H5'/></svg>" />
-  <script type="text/babel" data-presets='[["react",{"runtime":"classic"}], "env"]'>
+
     const { React, ReactDOM } = window;
     const useState = React.useState;
     const useEffect = React.useEffect;
@@ -431,30 +401,4 @@
       s.onerror = () => alert("Could not load JSZip; multi-file download unavailable.");
       document.body.appendChild(s);
     }
-  </script>
-  <script>
-    (function () {
-      if (!document.getElementById("__cyber-styles")) {
-        const s = document.createElement("style");
-        s.id = "__cyber-styles";
-        s.textContent = [
-          ".header-glass { @apply bg-slate-900/80 backdrop-blur-md border-b border-slate-800/60; }",
-          ".modal-glass { @apply bg-slate-900/90 backdrop-blur-md border border-slate-700/60; }",
-          ".card { @apply bg-slate-900/50 border border-slate-800/60 rounded-lg hover:bg-slate-800/50 transition-all; }",
-          ".btn-cyan { @apply px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-colors text-sm font-medium; }",
-          ".btn-ghost { @apply p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-colors; }",
-          ".editor { @apply w-full min-h-[400px] bg-slate-900/30 border-0 text-slate-200 font-mono text-sm p-4 resize-none focus:ring-1 focus:ring-cyan-500/50; }",
-          ".pulse { animation: pulse 2s ease-in-out infinite; }",
-          "@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }",
-          "@keyframes spin { to { transform: rotate(360deg); } }",
-          ".animate-spin { animation: spin 1s linear infinite; }"
-        ].join("\n");
-        document.head.appendChild(s);
-      }
-    })();
-  </script>
-  <script>
-    ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
-  </script>
-</body>
-</html>
+  
