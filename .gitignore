@@ -1,0 +1,4 @@
+# Build artifacts (none — static site)
+node_modules/
+*.log
+.nojekyll

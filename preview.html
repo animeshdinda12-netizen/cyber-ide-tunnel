@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Loading • Cyber IDE Tunnel</title>
+  <meta name="description" content="Live preview rendered by Cyber IDE Browser Tunnel Service Worker. Standalone top-level window, no iframes." />
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
+  <style>
+    :root {
+      --bg: #020617;
+      --surface: #0f172a;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --cyan: #06b6d4;
+      --glow: 0 0 20px rgba(6, 182, 212, 0.35);
+    }
+    html,body { margin:0; padding:0; height:100%; width:100%; overflow:hidden; }
+    #status-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 2.25rem; background: rgba(2,6,23,0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border); display: flex; align-items: center;
+      padding: 0 1rem; gap: 0.75rem; z-index: 2147483000; color: var(--muted); font-size: 0.8rem;
+    }
+    .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--cyan); box-shadow: var(--glow); }
+    .badge { display: inline-flex; align-items: center; gap: .3rem; padding: .125rem .5rem; border-radius: .3rem; font-size: .7rem; border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <header id="status-bar"><span class="dot"></span><span id="sb-label">Cyber IDE Tunnel</span><span class="badge" id="project-name"></span></header>
+  <script>
+    (function () {
+      "use strict";
+      const root = function (k, v) { return (document.documentElement.style[k] = v); };
+      const params = new URLSearchParams(location.search);
+      const encoded = params.get("t") || params.get("data") || "";
+      const projName = decodeURIComponent(params.get("n") || "Live Preview");
+      const nameEl = document.getElementById("project-name");
+      nameEl.textContent = projName;
+
+      // Error boundary: if storage or decoding fails, show a friendly top-level page.
+      function showError(msg) {
+        document.body.innerHTML =
+          '<div style="height:100vh;width:100%;display:grid;place-items:center;background:#020617;color:#e2e8f0;font-family:ui-monospace,monospace;text-align:center;">' +
+          '<div><h2 style="color:#f87171;font-size:1.5rem;margin-bottom:.5rem;">⚠ Preview Unavailable</h2>' +
+          '<p style="color:#94a3b8;margin-bottom:1rem;">' + (msg || "No tunnel payload detected.") + '</p>' +
+          '<button onclick="location.reload()" style="padding:.5rem 1rem;border-radius:.3rem;background:#0891b2;color:#fff;border:0;cursor:pointer;">Reload</button></div></div>';
+      }
+
+      if (!encoded) { showError("Missing tunnel payload. This preview URL was opened directly without a tunnel code."); return; }
+
+      let raw = null;
+      try {
+        // Primary decode: lz-string encodedURIComponent
+        raw = lzString.decompressFromEncodedURIComponent(encoded);
+      } catch (e) {
+        raw = null;
+      }
+      if (raw == null) {
+        try {
+          // Fallback 1: lz-string base64
+          raw = lzString.decompressFromUTF16(encoded);
+        } catch (e) { raw = null; }
+      }
+      if (raw == null) {
+        try {
+          // Fallback 2: plain base64
+          raw = decodeURIComponent(atob(encoded.replace(/-/g, "+").replace(/_/g, "/")));
+        } catch (e) {
+          try {
+            // Fallback 3: URI base64
+            raw = decodeURIComponent(escape(atob(encoded)));
+          } catch (e2) { raw = null; }
+        }
+      }
+      if (raw == null || typeof raw !== "string" || raw.length === 0) {
+        showError("Failed to decompress the tunnel payload. The link may be corrupted or expired.");
+        return;
+      }
+
+      let data;
+      try { data = JSON.parse(raw); } catch (e) {
+        showError("Decoded payload is not valid JSON. The project data may have been corrupted.");
+        return;
+      }
+
+      // Build a complete document string and replace the current top-level document via navigate.
+      function buildDoc(d) {
+        const html = String(d.html || "");
+        let head = '<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">';
+        if (d.css) { head += '<style>' + d.css + '</style>'; }
+        head += '</head><body>';
+        let body = html;
+        if (d.js) { body += '<script>(function(){try{' + d.js + '}catch(e){console.error("[tunnel]",e);}})();<\/script>'; }
+        return '<!DOCTYPE html><html lang="en">' + head + body + '</body></html>';
+      }
+
+      const htmlStr = buildDoc(data);
+
+      // Attempt a full top-level navigation-style document replacement so the preview
+      // runs natively (no iframe, full screen, full permissions).
+      try {
+        // Use document.write on an about:blank-loaded document, then close to commit.
+        document.open();
+        document.write(htmlStr);
+        document.close();
+      } catch (err) {
+        // If the current document cannot be replaced (e.g. non-http context),
+        // fall back to a navigable blob URL so the preview opens as a pure window.
+        try {
+          const blob = new Blob([htmlStr], { type: "text/html" });
+          const url = URL.createObjectURL(blob);
+          location.replace(url);
+        } catch (e2) {
+          showError("Could not render the preview document. " + (e2.message || ""));
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
