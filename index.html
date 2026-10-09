@@ -29,7 +29,11 @@
   </script>
   <link rel="icon" href="https://cdn.lucide.dev/icons/codesandbox.svg" />
   <script type="text/babel" data-presets="env,react,typescript">
-    const { React, ReactDOM, useState, useEffect, useRef, Fragment } = window;
+    const { React, ReactDOM } = window;
+    const useState = React.useState;
+    const useEffect = React.useEffect;
+    const useRef = React.useRef;
+    const Fragment = React.Fragment;
 
     const STORAGE_KEY = "cyber-ide-projects";
     function loadProjects() {

@@ -1,5 +1,6 @@
 /*
  * sw.js — Cyber IDE Browser Tunnel Service Worker
+ * version: 1.0.2  (cache-bust to force SW reinstall after blank-page deploy)
  *
  * Pure top-level deployment routing mechanism. When a Tunnel Preview URL
  * (preview.html?t=<lz-string>&e=<expiry>&n=<name>) is navigated to, this
